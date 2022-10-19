@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat App</title>
+</head>
+<body>
+
+    <h1>Group: {{groupname}}</h1>
+    <textarea id="chat-log" cols="50" rows="20">
+    {% for chat in chats %}
+        {{ chat.content }}
+    {% endfor %}
+    </textarea><br>
+    <input type="text" name="" id="chat-message-input" size="100"><br>
+    <input type="button" value="send" id="chat-message-submit">
+
+    <!-- For Static-->
+    
+<!-- 
+    <script>
+
+        // var ws = new WebSocket('ws://127.0.0.1:8000/ws/sc/')
+        var ws = new WebSocket('ws://127.0.0.1:8000/ws/ac/')
+        
+        ws.onopen = function(){
+            console.log('Websocket connection Open')
+            // ws.send('hi from client')
+        }
+
+        ws.onmessage = function(event){
+            console.log('Message received from server', event.data)
+            const data = JSON.parse(event.data) //convert string to object
+            console.log('Parsed data:', data)
+            console.log('Type of Parsed data:', typeof(data))
+            console.log('Actual message:', data.msg)
+            document.querySelector('#chat-log').value +=(data.msg + '\n')
+        }
+
+        ws.onclose = function(event){
+            console.log('Websocket Closed', event)
+        }
+
+        document.getElementById("chat-message-submit").onclick = function(event){
+            const messageInputDom = document.getElementById('chat-message-input')
+            const message = messageInputDom.value
+            ws.send(JSON.stringify({
+                'msg': message
+            }))
+            messageInputDom.value = ''
+        }
+
+    </script> -->
+
+    <!-- For Dynamic Group Name -->
+
+    {{groupname | json_script:"group_name"}}
+    <!-- by this we will be able to use the group value safely in our JS -->
+    <script>
+
+        const groupName = JSON.parse(document.getElementById("group_name").textContent) //new
+        console.log("Group name:",groupName) //new
+
+        // var ws = new WebSocket('ws://127.0.0.1:8000/ws/sc/')
+        // var ws = new WebSocket('ws://127.0.0.1:8000/ws/ac/')
+        
+        // for appending our group name to the websocket
+        var ws = new WebSocket(
+            'ws://' 
+            + window.location.host //127.0.0.1
+            + '/ws/ac/' 
+            + groupName 
+            + '/'
+        )
+
+
+        ws.onopen = function(){
+            console.log('Websocket connection Open')
+            // ws.send('hi from client')
+        }
+
+        ws.onmessage = function(event){
+            console.log('Message received from server', event.data)
+            const data = JSON.parse(event.data) //convert string to object
+            console.log('Parsed data:', data)
+            console.log('Type of Parsed data:', typeof(data))
+            console.log('Actual message:', data.msg)
+            console.log('Username:', data.user)
+            document.querySelector('#chat-log').value +=("@"+data.user +":" + data.msg + '\n')
+        }
+
+        ws.onclose = function(event){
+            console.log('Websocket Closed', event)
+        }
+
+        document.getElementById("chat-message-submit").onclick = function(event){
+            const messageInputDom = document.getElementById('chat-message-input')
+            const message = messageInputDom.value
+            ws.send(JSON.stringify({
+                'msg': message
+            }))
+            messageInputDom.value = ''
+        }
+
+    </script>
+
+</body>
+</html>
